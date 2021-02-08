@@ -29,6 +29,9 @@ class TypeVar:
         covariant: bool = ...,
         contravariant: bool = ...,
     ) -> None: ...
+    if sys.version_info >= (3, 10):
+        def __or__(self, right: type) -> Union: ...
+        def __ror__(self, right: type) -> Union: ...
 
 _promote = object()
 
