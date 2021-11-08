@@ -8,7 +8,7 @@ from typing_extensions import ParamSpec, Protocol
 class AbstractContextManager(Protocol[_T_co]):  # typing.ContextManager
     def __enter__(self) -> _T_co: ...
     def __exit__(
-        self, __exc_type: Type[BaseException] | None, __exc_value: BaseException | None, __traceback: TracebackType | None
+        self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
     ) -> bool | None: ...
 
 if sys.version_info >= (3, 7):
@@ -16,7 +16,7 @@ if sys.version_info >= (3, 7):
     class AbstractAsyncContextManager(Protocol[_T_co]):  # typing.AsyncContextManager
         def __aenter__(self) -> Awaitable[_T_co]: ...
         def __aexit__(
-            self, __exc_type: Type[BaseException] | None, __exc_value: BaseException | None, __traceback: TracebackType | None
+            self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
         ) -> Awaitable[bool | None]: ...
 
 _T = TypeVar("_T")
