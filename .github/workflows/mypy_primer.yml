@@ -36,11 +36,27 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install git+https://github.com/hauntsaninja/mypy_primer.git
+      - name: Get mypy version
+        id: mypy-version
+        shell: bash
+        run: |
+          MYPY_REQ=$(grep mypy requirements-tests.txt)
+          pip install "${MYPY_REQ}"
+          VERSION=$(mypy --version)
+          echo "mypy --version: ${VERSION}"
+          MYPY_VERSION=$(echo ${VERSION} | cut -d ' ' -f 2)
+          COMMIT=$(echo ${MYPY_VERSION} | cut -d '.' -f 4)
+          if [[ -n "${COMMIT}" ]]; then
+            MYPY_VERSION=${COMMIT}
+          fi
+          echo "MYPY_VERSION=${MYPY_VERSION}"
+          echo "version=${MYPY_VERSION}" >> $GITHUB_OUTPUT
       - name: Run mypy_primer
         shell: bash
         run: |
           cd typeshed_to_test
-          MYPY_VERSION=$(grep mypy-dev== requirements-tests.txt | cut -d = -f 3)
+          MYPY_VERSION=${{ steps.mypy-version.outputs.version }}
+          # MYPY_VERSION=$(grep mypy-dev== requirements-tests.txt | cut -d = -f 3)
           echo "new commit"
           git rev-list --format=%s --max-count=1 $GITHUB_SHA
           git checkout -b upstream_main origin/main
