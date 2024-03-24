@@ -41,8 +41,7 @@ jobs:
         id: mypy-version
         shell: bash
         run: |
-          ls -l
-          MYPY_REQ=$(cat requirements-tests.txt | grep "mypy")
+          MYPY_REQ=$(grep mypy typeshed_to_test/requirements-tests.txt)
           pip install "${MYPY_REQ}"
           VERSION=$(mypy --version)
           echo "mypy --version: ${VERSION}"
