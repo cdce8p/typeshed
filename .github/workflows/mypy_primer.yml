@@ -42,12 +42,14 @@ jobs:
         shell: bash
         run: |
           MYPY_REQ=$(grep mypy typeshed_to_test/requirements-tests.txt)
-          pip install "${MYPY_REQ}"
-          VERSION=$(mypy --version)
-          echo "mypy --version: ${VERSION}"
+          pip install --no-deps "${MYPY_REQ}"
+          VERSION=$(python -c "from mypy.version import __version__ as v; print(v)")
+          echo "mypy version: ${VERSION}"
           MYPY_VERSION=$(echo ${VERSION} | cut -d ' ' -f 2)
           COMMIT=$(echo ${MYPY_VERSION} | cut -d '.' -f 4)
-          if [[ -n "${COMMIT}" ]]; then
+          if [[ -z "${COMMIT}" ]]; then
+            MYPY_VERSION="v{MYPY_VERSION}"
+          else
             MYPY_VERSION=${COMMIT}
           fi
           echo "MYPY_VERSION=${MYPY_VERSION}"
@@ -68,7 +70,7 @@ jobs:
           # fail action if exit code isn't zero or one
           (
             mypy_primer \
-            --new v${MYPY_VERSION} --old v${MYPY_VERSION} \
+            --new ${MYPY_VERSION} --old ${MYPY_VERSION} \
             --custom-typeshed-repo typeshed_to_test \
             --new-typeshed $GITHUB_SHA --old-typeshed upstream_main \
             --num-shards 4 --shard-index ${{ matrix.shard-index }} \
